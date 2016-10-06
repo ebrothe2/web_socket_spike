@@ -9,7 +9,9 @@ class ChatBackend
 
   def call(env)
     if Faye::WebSocket.websocket?(env)
+
       web_socket = Faye::WebSocket.new(env, nil, {ping: KEEPALIVE_TIME })
+
       web_socket.on :open do |event|
          p [:open, web_socket.object_id]
          @clients << web_socket
@@ -27,6 +29,7 @@ class ChatBackend
       end
 
       web_socket.rack_response
+
     else
       @app.call(env)
     end
