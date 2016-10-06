@@ -9,24 +9,24 @@ class ChatBackend
 
   def call(env)
     if Faye::WebSocket.websocket?(env)
-      ws = Faye::WebSocket.new(env, nil, {ping: KEEPALIVE_TIME })
-      ws.on :open do |event|
-         p [:open, ws.object_id]
-         @clients << ws
+      web_socket = Faye::WebSocket.new(env, nil, {ping: KEEPALIVE_TIME })
+      web_socket.on :open do |event|
+         p [:open, web_socket.object_id]
+         @clients << web_socket
       end
 
-      ws.on :message do |event|
+      web_socket.on :message do |event|
         p [:message, event.data]
         @clients.each {|client| client.send(event.data) }
       end
 
-      ws.on :close do |event|
-        p [:close, ws.object_id, event.code, event.reason]
-        @clients.delete(ws)
-        ws = nil
+      web_socket.on :close do |event|
+        p [:close, web_socket.object_id, event.code, event.reason]
+        @clients.delete(web_socket)
+        web_socket = nil
       end
 
-      ws.rack_response
+      web_socket.rack_response
     else
       @app.call(env)
     end
